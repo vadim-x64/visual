@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const timeDisplay = document.getElementById("time-display");
     const timeline = document.getElementById("timeline");
     const animationSelect = document.getElementById("animation");
+    const moonContainer = document.getElementById("moon-container");
     let hideTimeout;
     let w = (canvas.width = window.innerWidth);
     let h = (canvas.height = window.innerHeight);
@@ -55,11 +56,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (file && file.type.startsWith("audio/")) {
             const url = URL.createObjectURL(file);
             audio.src = url;
-
             trackInfo.textContent = file.name;
             trackInfo.classList.add("visible");
             timeDisplay.classList.add("visible");
-
             audio.addEventListener("loadedmetadata", () => {
                 timeline.max = Math.floor(audio.duration);
                 isMusicLoaded = true;
@@ -116,10 +115,9 @@ document.addEventListener("DOMContentLoaded", () => {
             this.y = y;
             this.r = r;
             this.color = color;
-            this.vx = (Math.random() - 0.5) * 1.5;
-            this.vy = (Math.random() - 0.5) * 1.5;
+            this.vx = (Math.random() - 0.5) * 1.7;
+            this.vy = (Math.random() - 0.5) * 1.7;
         }
-
         update() {
             this.x += this.vx;
             this.y += this.vy;
@@ -335,14 +333,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 bar.glow += (bar.targetGlow - bar.glow) * 0.3;
                 bar.color.h = (bar.color.h + bar.glow * 0.5) % 360;
                 const currentHue = bar.color.h;
-                ctx.shadowBlur = 30 + bar.glow * 60;
+                ctx.shadowBlur = 30 + bar.glow * 100;
                 ctx.shadowColor = `hsla(${currentHue}, 100%, 75%, ${bar.glow * 0.7})`;
                 if (bar.currentUpperHeight > 1) {
                     const gradient = ctx.createLinearGradient(x, centerY, x, centerY - bar.currentUpperHeight);
                     gradient.addColorStop(0, `hsla(${currentHue}, 100%, 65%, 1)`);
                     gradient.addColorStop(1, `hsla(${currentHue}, 100%, 85%, 1)`);
                     ctx.fillStyle = gradient;
-                    ctx.fillRect(x, centerY - bar.currentUpperHeight, effectiveBarWidth, bar.currentUpperHeight);
+                    ctx.fillRect(x, centerY - bar.currentUpperHeight, effectiveBarWidth, bar.currentUpperHeight + 1);
                 }
                 if (bar.currentLowerHeight > 1) {
                     const gradient = ctx.createLinearGradient(x, centerY, x, centerY + bar.currentLowerHeight);
@@ -402,6 +400,42 @@ document.addEventListener("DOMContentLoaded", () => {
             ctx.fill();
         }
     }
+    class Comet {
+        constructor() {
+            this.x = Math.random() * w;
+            this.y = -20;
+            this.vx = (Math.random() - 0.5) * 4;
+            this.vy = 2 + Math.random() * 3;
+            this.size = 1.5 + Math.random();
+            this.life = 1;
+            this.tailLength = 15;
+            this.history = [];
+        }
+        update() {
+            this.history.push({ x: this.x, y: this.y });
+            if (this.history.length > this.tailLength) {
+                this.history.shift();
+            }
+            this.x += this.vx;
+            this.y += this.vy;
+            if (this.x < -50 || this.x > w + 50 || this.y > h + 50) {
+                this.life = 0;
+            }
+        }
+        draw(ctx) {
+            if (this.history.length > 1) {
+                const gradient = ctx.createLinearGradient(this.x, this.y, this.history[0].x, this.history[0].y);
+                gradient.addColorStop(0, `hsla(220, 100%, 95%, 0.7)`);
+                gradient.addColorStop(1, `hsla(220, 100%, 95%, 0)`);
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(this.history[0].x, this.history[0].y);
+                ctx.strokeStyle = gradient;
+                ctx.lineWidth = this.size;
+                ctx.stroke();
+            }
+        }
+    }
     class Shockwave {
         constructor(x, y) {
             this.x = x;
@@ -432,6 +466,8 @@ document.addEventListener("DOMContentLoaded", () => {
             this.particles = [];
             this.stars = [];
             this.shockwaves = [];
+            this.comets = [];
+            this.nextCometSpawnTime = 0;
             for (let i = 0; i < 200; i++) {
                 this.stars.push(new Star());
             }
@@ -443,6 +479,18 @@ document.addEventListener("DOMContentLoaded", () => {
             const highLevel = highSum / (100 * 255);
             ctx.globalCompositeOperation = "source-over";
             this.stars.forEach(star => star.draw(ctx));
+            if (time > this.nextCometSpawnTime) {
+                this.comets.push(new Comet());
+                this.nextCometSpawnTime = time + 300 + Math.random() * 200;
+            }
+            for (let i = this.comets.length - 1; i >= 0; i--) {
+                const comet = this.comets[i];
+                comet.update();
+                comet.draw(ctx);
+                if (comet.life <= 0) {
+                    this.comets.splice(i, 1);
+                }
+            }
             if (bassLevel > 0.7 && Math.random() < 0.2) {
                 this.shockwaves.push(new Shockwave(w / 2, h / 2));
             }
@@ -511,6 +559,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const barViz = new BarVisualization();
     const cosmicViz = new CosmicRiftVisualization();
     let time = 0;
+    let smoothedBassLevel = 0;
     function animate() {
         ctx.clearRect(0, 0, w, h);
         ctx.globalCompositeOperation = "lighter";
@@ -530,6 +579,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 analyser.getByteFrequencyData(dataArray);
                 const bassSum = dataArray.slice(0, 16).reduce((a, b) => a + b, 0);
                 const bassLevel = bassSum / (16 * 255);
+                smoothedBassLevel += (bassLevel - smoothedBassLevel) * 0.1;
                 const transitionSpeed = 0.04;
                 if (currentAnimation !== targetAnimation) {
                     transitionOpacity -= transitionSpeed;
@@ -547,13 +597,13 @@ document.addEventListener("DOMContentLoaded", () => {
                         ctx.globalCompositeOperation = "lighter";
                         const centerX = w / 2;
                         const centerY = h / 2;
-                        const mainRingRadius = 150 + bassLevel * 80;
+                        const mainRingRadius = 150 + smoothedBassLevel * 80;
                         dentingOrbs.forEach(orb => {
-                            orb.update(bassLevel);
+                            orb.update(smoothedBassLevel);
                             orb.draw(ctx, centerX, centerY, mainRingRadius, finalOpacity);
                         });
                         orbs.forEach(orb => {
-                            orb.update(dataArray, bassLevel, time);
+                            orb.update(dataArray, smoothedBassLevel, time);
                             orb.draw(ctx, centerX, centerY, finalOpacity);
                         });
                         break;
@@ -566,12 +616,17 @@ document.addEventListener("DOMContentLoaded", () => {
                         barViz.draw(ctx, dataArray, finalOpacity);
                         break;
                     case "cosmic":
-                        ctx.globalCompositeOperation = "lighter";
+                        ctx.globalCompositeOperation = "source-over";
                         cosmicViz.draw(ctx, dataArray, finalOpacity, time);
                         break;
                 }
                 time += 1;
             }
+        }
+        if (currentAnimation === 'cosmic' && isVisualizationActive && visualizationOpacity > 0.05) {
+            moonContainer.classList.add('visible');
+        } else {
+            moonContainer.classList.remove('visible');
         }
         ctx.globalCompositeOperation = "source-over";
         requestAnimationFrame(animate);
