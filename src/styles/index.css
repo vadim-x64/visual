@@ -159,10 +159,10 @@ body {
     position: fixed;
     top: 60px;
     right: 100px;
-    width: 100px;
-    height: 100px;
+    width: 200px;
+    height: 200px;
     z-index: 10;
-    animation: moonDrift 1s infinite alternate ease-in-out, moonWobble 3s infinite ease-in-out;
+    animation: moonDrift 1s infinite alternate ease-in-out, moonWobble 2s infinite ease-in-out;
     opacity: 0;
     visibility: hidden;
     transition: opacity 1.2s ease-in-out, visibility 1.2s ease-in-out;
@@ -183,22 +183,22 @@ body {
 
 @keyframes moonDrift {
     0% {
-        transform: translate(-10px, -10px) rotate(-4deg);
+        transform: translate(-10px, -10px) rotate(-5deg);
     }
     100% {
-        transform: translate(10px, 5px) rotate(4deg);
+        transform: translate(10px, 5px) rotate(5deg);
     }
 }
 
 @keyframes moonWobble {
     0% {
-        transform: rotate(-1.5deg);
+        transform: rotate(-2deg);
     }
     50% {
-        transform: rotate(1.5deg);
+        transform: rotate(2deg);
     }
     100% {
-        transform: rotate(-1.5deg);
+        transform: rotate(-2deg);
     }
 }
 
