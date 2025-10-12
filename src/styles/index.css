@@ -43,6 +43,17 @@ body {
     transition: background 0.2s ease;
 }
 
+.btn i {
+    font-size: 24px;
+    vertical-align: middle;
+}
+
+.volume-icon i {
+    font-size: 22px;
+    vertical-align: middle;
+    color: white;
+}
+
 .btn:hover {
     background: rgba(255, 255, 255, 0.25);
 }
@@ -73,6 +84,9 @@ body {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 10px;
 }
 
 .track-info {

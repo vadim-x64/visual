@@ -12,6 +12,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const timeline = document.getElementById("timeline");
     const animationSelect = document.getElementById("animation");
     const moonContainer = document.getElementById("moon-container");
+    const playPauseIcon = document.querySelector(".play-pause i");
+    const volumeIcon = document.querySelector(".volume-icon i");
     let hideTimeout;
     let w = (canvas.width = window.innerWidth);
     let h = (canvas.height = window.innerHeight);
@@ -28,10 +30,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const initialVolume = savedVolume !== null ? parseFloat(savedVolume) : 100;
     volumeSlider.value = initialVolume;
     audio.volume = initialVolume / 100;
+    updateVolumeIcon();
     volumeSlider.addEventListener("input", () => {
         const volumeValue = volumeSlider.value / 100;
         audio.volume = volumeValue;
         localStorage.setItem("audioVolume", volumeSlider.value);
+        updateVolumeIcon(); // Оновити іконку
     });
     window.addEventListener("resize", () => {
         w = canvas.width = window.innerWidth;
@@ -72,9 +76,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (audio.paused) {
             audio.play();
+            playPauseIcon.className = "bi bi-pause-fill"; // Змінити на "пауза"
             isVisualizationActive = true;
         } else {
             audio.pause();
+            playPauseIcon.className = "bi bi-play-fill"; // Змінити на "плей"
             isVisualizationActive = false;
         }
     });
@@ -90,6 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
         timeline.value = 0;
         updateTimeDisplay();
         isVisualizationActive = false;
+        playPauseIcon.className = "bi bi-play-fill"; // Повернути іконку "плей"
     });
     function updateTimeDisplay() {
         const current = formatTime(timeline.value || 0);
@@ -100,6 +107,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const mins = Math.floor(seconds / 60);
         const secs = Math.floor(seconds % 60);
         return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+    function updateVolumeIcon() {
+        if (audio.volume === 0) {
+            volumeIcon.className = "bi bi-volume-mute-fill";
+        } else {
+            volumeIcon.className = "bi bi-volume-up-fill";
+        }
     }
     timeline.addEventListener("input", () => {
         isUserSeeking = true;

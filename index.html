@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Фонове відео</title>
     <link rel="stylesheet" href="src/styles/index.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
 <canvas id="background"></canvas>
@@ -14,7 +15,7 @@
 <div class="sidebar">
     <button class="btn add-music" title="Додати музику">＋</button>
     <input type="file" id="music-input" accept="audio/*" style="display: none;">
-    <button class="btn play-pause" title="Старт / Пауза">⏯️</button>
+    <button class="btn play-pause" title="Старт / Пауза"><i class="bi bi-play-fill"></i></button>
     <div class="animation-select">
         <label for="animation">Анімація:</label>
         <select id="animation">
@@ -30,7 +31,7 @@
     <input type="range" id="timeline" min="0" max="100" value="0">
     <div class="time-display" id="time-display"></div>
     <div class="volume-control">
-        <span class="volume-icon">🔊</span>
+        <span class="volume-icon"><i class="bi bi-volume-up-fill"></i></span>
         <input type="range" id="volume" min="0" max="100" value="100">
     </div>
 </div>
