@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jura:wght@400;600;700&display=swap');
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Major Mono Display", serif;
+    font-family: "Jura", sans-serif;
 }
 
 body {
@@ -50,7 +50,7 @@ body {
     vertical-align: middle;
 }
 
-.volume-icon i {
+.volume-icon i, .timeline-icon i {
     font-size: 24px;
     vertical-align: middle;
     color: #FFFFFF;
@@ -69,6 +69,11 @@ body {
     outline: none;
     cursor: pointer;
     font-size: 16px;
+}
+
+.animation-select select option {
+    background-color: #000000;
+    color: #FFFFFF;
 }
 
 .footer {
@@ -144,10 +149,10 @@ body {
     transform: translateX(-50%);
 }
 
-.volume-control {
+.volume-control, .timeline-control {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 10px;
     justify-content: center;
 }
 

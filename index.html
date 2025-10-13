@@ -6,8 +6,7 @@
     <title>Фонове відео</title>
     <link rel="stylesheet" href="src/styles/index.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Jura:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 <canvas id="background"></canvas>
@@ -15,9 +14,9 @@
     <img id="moon-image" src="src/moon.png" alt="Moon">
 </div>
 <div class="sidebar">
-    <button class="btn add-music" title="Додати музику">＋</button>
+    <button class="btn add-music">＋</button>
     <input type="file" id="music-input" accept="audio/*" style="display: none;">
-    <button class="btn play-pause" title="Старт / Пауза"><i class="bi bi-play-fill"></i></button>
+    <button class="btn play-pause"><i class="bi bi-play-fill"></i></button>
     <div class="animation-select">
         <select id="animation">
             <option value="circle">Коло</option>
@@ -29,7 +28,10 @@
 </div>
 <div class="footer">
     <div class="track-info" id="track-info"></div>
-    <input type="range" id="timeline" min="0" max="100" value="0">
+    <div class="timeline-control">
+        <span class="timeline-icon"><i class="bi bi-music-note-beamed"></i></span>
+        <input type="range" id="timeline" min="0" max="100" value="0">
+    </div>
     <div class="time-display" id="time-display"></div>
     <div class="volume-control">
         <span class="volume-icon"><i class="bi bi-volume-up-fill"></i></span>
