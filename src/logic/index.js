@@ -120,13 +120,64 @@ document.addEventListener("DOMContentLoaded", () => {
         playlistList.innerHTML = "";
         playlist.forEach((name, index) => {
             const li = document.createElement("li");
-            li.textContent = name;
+            // Додаємо іконку хрестика
+            const deleteIcon = document.createElement("i");
+            deleteIcon.className = "bi bi-x-circle";
+            deleteIcon.style.marginRight = "10px";
+            deleteIcon.style.cursor = "pointer";
+            deleteIcon.addEventListener("click", (e) => {
+                e.stopPropagation(); // Запобігаємо запуску відтворення треку
+                deleteTrack(index);
+            });
+
+            li.appendChild(deleteIcon);
+            li.appendChild(document.createTextNode(name));
             li.addEventListener("click", () => playTrack(index));
             if (index === currentIndex) {
                 li.classList.add("current");
             }
             playlistList.appendChild(li);
         });
+    }
+
+    function deleteTrack(index) {
+        if (!db || index < 0 || index >= playlist.length) return;
+
+        const trackName = playlist[index];
+        const tx = db.transaction(["tracks"], "readwrite");
+        const store = tx.objectStore("tracks");
+        store.delete(trackName);
+
+        tx.oncomplete = () => {
+            // Оновлюємо плейлист
+            playlist.splice(index, 1);
+
+            // Якщо видалений трек був поточним
+            if (index === currentIndex) {
+                audio.pause();
+                if (audio.src) {
+                    URL.revokeObjectURL(audio.src);
+                    audio.src = "";
+                }
+                isMusicLoaded = false;
+                trackInfo.classList.remove("visible");
+                timeDisplay.classList.remove("visible");
+                playPauseIcon.className = "bi bi-play-fill";
+                isVisualizationActive = false;
+                currentIndex = -1;
+            } else if (index < currentIndex) {
+                currentIndex--; // Оновлюємо індекс, якщо видалений трек був перед поточним
+            }
+
+            // Якщо плейлист порожній, вимикаємо автоплей
+            if (playlist.length === 0 && isAutoplay) {
+                isAutoplay = false;
+                autoplayBtn.classList.remove("active");
+                autoplayBtn.style.color = "#FFFFFF";
+            }
+
+            populatePlaylist(); // Оновлюємо відображення плейлиста
+        };
     }
     function onAudioLoadedMetadata() {
         timeline.max = Math.floor(audio.duration);
