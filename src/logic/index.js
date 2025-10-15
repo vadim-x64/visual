@@ -6,6 +6,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const ctx = canvas.getContext("2d");
     const addMusicBtn = document.querySelector(".add-music");
     const playPauseBtn = document.querySelector(".play-pause");
+    const autoplayBtn = document.querySelector(".autoplay-toggle");
+    let isAutoplay = false;
+    autoplayBtn.addEventListener("click", () => {
+        isAutoplay = !isAutoplay;
+        autoplayBtn.classList.toggle("active", isAutoplay);
+        autoplayBtn.querySelector("i").className = isAutoplay ? "bi bi-infinity" : "bi bi-infinity";
+        autoplayBtn.style.color = isAutoplay ? "#FFD700" : "#FFFFFF";
+    });
     const musicInput = document.getElementById("music-input");
     const audio = document.getElementById("audio");
     const trackInfo = document.getElementById("track-info");
@@ -93,7 +101,6 @@ document.addEventListener("DOMContentLoaded", () => {
         initAudioContext();
     }
     function playTrack(index) {
-        if (currentIndex === index && !audio.paused) return;
         if (currentIndex !== -1 && audio.src) {
             URL.revokeObjectURL(audio.src);
         }
@@ -112,6 +119,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 timeDisplay.classList.add("visible");
                 isMusicLoaded = true;
                 audio.addEventListener("loadedmetadata", onAudioLoadedMetadata, { once: true });
+
+                if (!audio.paused || isAutoplay) {
+                    audio.play();
+                    playPauseIcon.className = "bi bi-pause-fill";
+                    isVisualizationActive = true;
+                }
             }
             populatePlaylist();
         };
@@ -174,6 +187,10 @@ document.addEventListener("DOMContentLoaded", () => {
     playPauseBtn.addEventListener("click", () => {
         if (!isMusicLoaded) return;
 
+        if (!audioContext) {
+            initAudioContext();
+        }
+
         if (audio.paused) {
             audio.play();
             playPauseIcon.className = "bi bi-pause-fill"; // Змінити на "пауза"
@@ -192,11 +209,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     audio.addEventListener("ended", () => {
         audio.pause();
-        audio.currentTime = 0;
-        timeline.value = 0;
+        timeline.value = timeline.max;
         updateTimeDisplay();
         isVisualizationActive = false;
         playPauseIcon.className = "bi bi-play-fill"; // Повернути іконку "плей"
+        if (isAutoplay && currentIndex < playlist.length - 1) {
+            playTrack(currentIndex + 1);
+            setTimeout(() => {
+                audio.play();
+                playPauseIcon.className = "bi bi-pause-fill";
+            }, 500);
+        }
     });
     function updateTimeDisplay() {
         const current = formatTime(timeline.value || 0);
