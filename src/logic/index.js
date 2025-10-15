@@ -6,8 +6,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const ctx = canvas.getContext("2d");
     const addMusicBtn = document.querySelector(".add-music");
     const playPauseBtn = document.querySelector(".play-pause");
+    const repeatBtn = document.querySelector(".repeat-toggle");
     const autoplayBtn = document.querySelector(".autoplay-toggle");
     let isAutoplay = false;
+    let repeatState = 0; // 0: вимкнено, 1: повторити 1 раз, 2: повторити 2 рази
+    let repeatCount = 0;
     autoplayBtn.addEventListener("click", () => {
         if (playlist.length === 0) {
             return; // Не дозволяємо увімкнути автоплей, якщо плейлист порожній
@@ -27,6 +30,23 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     });
+    repeatBtn.addEventListener("click", () => {
+        repeatState = (repeatState + 1) % 3; // Перемикання між 0, 1, 2
+        updateRepeatIcon();
+    });
+    function updateRepeatIcon() {
+        const icon = repeatBtn.querySelector("i");
+        if (repeatState === 0) {
+            icon.className = "bi bi-repeat";
+            repeatBtn.style.color = "#FFFFFF";
+        } else if (repeatState === 1) {
+            icon.className = "bi bi-repeat-1";
+            repeatBtn.style.color = "#FFD700";
+        } else {
+            icon.className = "bi bi-repeat-1";
+            repeatBtn.style.color = "#FF4500";
+        }
+    }
     const musicInput = document.getElementById("music-input");
     const audio = document.getElementById("audio");
     const trackInfo = document.getElementById("track-info");
@@ -118,6 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
             URL.revokeObjectURL(audio.src);
         }
         currentIndex = index;
+        repeatCount = 0;
         const path = playlist[index];
         if (!db || !path) return;
         const tx = db.transaction(["tracks"], "readonly");
@@ -231,7 +252,13 @@ document.addEventListener("DOMContentLoaded", () => {
         updateTimeDisplay();
         isVisualizationActive = false;
         playPauseIcon.className = "bi bi-play-fill"; // Повернути іконку "плей"
-        if (isAutoplay && currentIndex < playlist.length - 1) {
+        if (repeatState > 0 && repeatCount < repeatState) {
+            repeatCount++;
+            audio.currentTime = 0;
+            audio.play();
+            playPauseIcon.className = "bi bi-pause-fill";
+            isVisualizationActive = true;
+        } else if (isAutoplay && currentIndex < playlist.length - 1) {
             playTrack(currentIndex + 1);
             setTimeout(() => {
                 audio.play();
