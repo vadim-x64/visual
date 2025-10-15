@@ -15,7 +15,7 @@
 </div>
 <div class="sidebar">
     <button class="btn add-music">＋</button>
-    <input type="file" id="music-input" accept="audio/*" style="display: none;">
+    <input type="file" id="music-input" accept="audio/*" multiple style="display: none;">
     <button class="btn play-pause"><i class="bi bi-play-fill"></i></button>
     <div class="animation-select">
         <select id="animation">
@@ -25,6 +25,11 @@
             <option value="cosmic">Космос</option>
         </select>
     </div>
+</div>
+<div class="playlist-sidebar">
+    <h3 style="color: #FFFFFF; margin-bottom: 10px; text-align: center;">Playlist</h3>
+    <button id="clear-playlist" class="btn">Clear</button>
+    <ul id="playlist-list"></ul>
 </div>
 <div class="footer">
     <div class="track-info" id="track-info"></div>

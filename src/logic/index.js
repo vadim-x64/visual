@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const sidebar = document.querySelector(".sidebar");
     const footer = document.querySelector(".footer");
+    const playlistSidebar = document.querySelector(".playlist-sidebar");
     const canvas = document.getElementById("background");
     const ctx = canvas.getContext("2d");
     const addMusicBtn = document.querySelector(".add-music");
@@ -14,6 +15,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const moonContainer = document.getElementById("moon-container");
     const playPauseIcon = document.querySelector(".play-pause i");
     const volumeIcon = document.querySelector(".volume-icon i");
+    const playlistList = document.getElementById("playlist-list");
+    const clearPlaylistBtn = document.getElementById("clear-playlist");
     let hideTimeout;
     let w = (canvas.width = window.innerWidth);
     let h = (canvas.height = window.innerHeight);
@@ -25,6 +28,9 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentAnimation = animationSelect.value;
     let targetAnimation = animationSelect.value;
     let transitionOpacity = 1;
+    let playlist = [];
+    let currentIndex = -1;
+    let db;
     const volumeSlider = document.getElementById("volume");
     const savedVolume = localStorage.getItem("audioVolume");
     const initialVolume = savedVolume !== null ? parseFloat(savedVolume) : 100;
@@ -41,6 +47,75 @@ document.addEventListener("DOMContentLoaded", () => {
         w = canvas.width = window.innerWidth;
         h = canvas.height = window.innerHeight;
     });
+    const dbRequest = indexedDB.open("MusicDB", 1);
+    dbRequest.onerror = () => {
+        console.error("IndexedDB error");
+    };
+    dbRequest.onsuccess = () => {
+        db = dbRequest.result;
+        loadPlaylist();
+    };
+    dbRequest.onupgradeneeded = (e) => {
+        db = e.target.result;
+        if (!db.objectStoreNames.contains("tracks")) {
+            db.createObjectStore("tracks", { keyPath: "path" });
+        }
+    };
+    function loadPlaylist() {
+        if (!db) return;
+        const tx = db.transaction(["tracks"], "readonly");
+        const store = tx.objectStore("tracks");
+        const req = store.getAll();
+        req.onsuccess = (e) => {
+            const tracks = e.target.result;
+            playlist = tracks.map((t) => t.displayName);
+            populatePlaylist();
+            if (playlist.length > 0 && currentIndex === -1) {
+                playTrack(0);
+            }
+        };
+    }
+    function populatePlaylist() {
+        playlistList.innerHTML = "";
+        playlist.forEach((name, index) => {
+            const li = document.createElement("li");
+            li.textContent = name;
+            li.addEventListener("click", () => playTrack(index));
+            if (index === currentIndex) {
+                li.classList.add("current");
+            }
+            playlistList.appendChild(li);
+        });
+    }
+    function onAudioLoadedMetadata() {
+        timeline.max = Math.floor(audio.duration);
+        updateTimeDisplay();
+        initAudioContext();
+    }
+    function playTrack(index) {
+        if (currentIndex === index && !audio.paused) return;
+        if (currentIndex !== -1 && audio.src) {
+            URL.revokeObjectURL(audio.src);
+        }
+        currentIndex = index;
+        const path = playlist[index];
+        if (!db || !path) return;
+        const tx = db.transaction(["tracks"], "readonly");
+        const store = tx.objectStore("tracks");
+        const req = store.get(path);
+        req.onsuccess = () => {
+            const track = req.result;
+            if (track) {
+                audio.src = URL.createObjectURL(track.blob);
+                trackInfo.textContent = track.displayName;
+                trackInfo.classList.add("visible");
+                timeDisplay.classList.add("visible");
+                isMusicLoaded = true;
+                audio.addEventListener("loadedmetadata", onAudioLoadedMetadata, { once: true });
+            }
+            populatePlaylist();
+        };
+    }
     function initAudioContext() {
         if (!audioContext) {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -56,20 +131,45 @@ document.addEventListener("DOMContentLoaded", () => {
         musicInput.click();
     });
     musicInput.addEventListener("change", (e) => {
-        const file = e.target.files[0];
-        if (file && file.type.startsWith("audio/")) {
-            const url = URL.createObjectURL(file);
-            audio.src = url;
-            trackInfo.textContent = file.name;
-            trackInfo.classList.add("visible");
-            timeDisplay.classList.add("visible");
-            audio.addEventListener("loadedmetadata", () => {
-                timeline.max = Math.floor(audio.duration);
-                isMusicLoaded = true;
-                updateTimeDisplay();
-                initAudioContext();
+        const files = Array.from(e.target.files)
+            .filter((f) => f.type.startsWith("audio/"))
+            .sort((a, b) => a.name.localeCompare(b.name));
+        if (files.length === 0) return;
+        if (!db) return;
+        const tx = db.transaction(["tracks"], "readwrite");
+        const store = tx.objectStore("tracks");
+        store.clear();
+        files.forEach((file) => {
+            store.put({
+                path: file.name,
+                displayName: file.name,
+                blob: file
             });
-        }
+        });
+        tx.oncomplete = () => {
+            loadPlaylist();
+        };
+    });
+    clearPlaylistBtn.addEventListener("click", () => {
+        if (!db) return;
+        const tx = db.transaction(["tracks"], "readwrite");
+        const store = tx.objectStore("tracks");
+        store.clear();
+        tx.oncomplete = () => {
+            playlist = [];
+            currentIndex = -1;
+            populatePlaylist();
+            if (audio.src) {
+                URL.revokeObjectURL(audio.src);
+                audio.pause();
+                audio.src = "";
+            }
+            isMusicLoaded = false;
+            trackInfo.classList.remove("visible");
+            timeDisplay.classList.remove("visible");
+            playPauseIcon.className = "bi bi-play-fill";
+            isVisualizationActive = false;
+        };
     });
     playPauseBtn.addEventListener("click", () => {
         if (!isMusicLoaded) return;
@@ -649,12 +749,14 @@ document.addEventListener("DOMContentLoaded", () => {
     function showControls() {
         sidebar.classList.add("visible");
         footer.classList.add("visible");
+        playlistSidebar.classList.add("visible");
         clearTimeout(hideTimeout);
         hideTimeout = setTimeout(hideControls, 3000);
     }
     function hideControls() {
         sidebar.classList.remove("visible");
         footer.classList.remove("visible");
+        playlistSidebar.classList.remove("visible");
     }
     showControls();
     document.addEventListener("mousemove", showControls);
