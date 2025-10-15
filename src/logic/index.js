@@ -9,10 +9,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const autoplayBtn = document.querySelector(".autoplay-toggle");
     let isAutoplay = false;
     autoplayBtn.addEventListener("click", () => {
+        if (playlist.length === 0) {
+            return; // Не дозволяємо увімкнути автоплей, якщо плейлист порожній
+        }
         isAutoplay = !isAutoplay;
         autoplayBtn.classList.toggle("active", isAutoplay);
         autoplayBtn.querySelector("i").className = isAutoplay ? "bi bi-infinity" : "bi bi-infinity";
         autoplayBtn.style.color = isAutoplay ? "#FFD700" : "#FFFFFF";
+
+        if (isAutoplay && playlist.length > 0) {
+            if (currentIndex === -1) {
+                playTrack(0); // Почати відтворення першого треку
+            } else if (isMusicLoaded && audio.paused) {
+                audio.play();
+                playPauseIcon.className = "bi bi-pause-fill";
+                isVisualizationActive = true;
+            }
+        }
     });
     const musicInput = document.getElementById("music-input");
     const audio = document.getElementById("audio");
@@ -78,8 +91,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const tracks = e.target.result;
             playlist = tracks.map((t) => t.displayName);
             populatePlaylist();
-            if (playlist.length > 0 && currentIndex === -1) {
-                playTrack(0);
+            if (playlist.length > 0 && currentIndex === -1 && isAutoplay) {
+                playTrack(0); // Auto-play first track if autoplay is enabled
             }
         };
     }
@@ -120,13 +133,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 isMusicLoaded = true;
                 audio.addEventListener("loadedmetadata", onAudioLoadedMetadata, { once: true });
 
-                if (!audio.paused || isAutoplay) {
-                    audio.play();
-                    playPauseIcon.className = "bi bi-pause-fill";
-                    isVisualizationActive = true;
-                }
+                audio.play();
+                playPauseIcon.className = "bi bi-pause-fill";
+                isVisualizationActive = true;
+
+                populatePlaylist();
             }
-            populatePlaylist();
         };
     }
     function initAudioContext() {
@@ -182,6 +194,12 @@ document.addEventListener("DOMContentLoaded", () => {
             timeDisplay.classList.remove("visible");
             playPauseIcon.className = "bi bi-play-fill";
             isVisualizationActive = false;
+
+            if (isAutoplay) {
+                isAutoplay = false;
+                autoplayBtn.classList.remove("active");
+                autoplayBtn.style.color = "#FFFFFF";
+            }
         };
     });
     playPauseBtn.addEventListener("click", () => {
