@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         isAutoplay = !isAutoplay;
         autoplayBtn.classList.toggle("active", isAutoplay);
-        autoplayBtn.querySelector("i").className = isAutoplay ? "bi bi-infinity" : "bi bi-infinity";
+        autoplayBtn.querySelector("i").className = isAutoplay ? "bi bi-arrow-repeat" : "bi bi-arrow-repeat";
         autoplayBtn.style.color = isAutoplay ? "#FFD700" : "#FFFFFF";
 
         if (isAutoplay && playlist.length > 0) {
@@ -165,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 isMusicLoaded = false;
                 trackInfo.classList.remove("visible");
                 timeDisplay.classList.remove("visible");
-                playPauseIcon.className = "bi bi-play-fill";
+                playPauseIcon.className = "bi-play";
                 isVisualizationActive = false;
                 currentIndex = -1;
             } else if (index < currentIndex) {
@@ -290,7 +290,7 @@ document.addEventListener("DOMContentLoaded", () => {
             isMusicLoaded = false;
             trackInfo.classList.remove("visible");
             timeDisplay.classList.remove("visible");
-            playPauseIcon.className = "bi bi-play-fill";
+            playPauseIcon.className = "bi-play";
             isVisualizationActive = false;
 
             if (isAutoplay) {
@@ -318,7 +318,7 @@ document.addEventListener("DOMContentLoaded", () => {
             isVisualizationActive = true;
         } else {
             audio.pause();
-            playPauseIcon.className = "bi bi-play-fill"; // Змінити на "плей"
+            playPauseIcon.className = "bi-play"; // Змінити на "плей"
             isVisualizationActive = false;
         }
     });
@@ -333,7 +333,7 @@ document.addEventListener("DOMContentLoaded", () => {
         timeline.value = timeline.max;
         updateTimeDisplay();
         isVisualizationActive = false;
-        playPauseIcon.className = "bi bi-play-fill"; // Повернути іконку "плей"
+        playPauseIcon.className = "bi-play"; // Повернути іконку "плей"
         if (repeatState > 0 && repeatCount < repeatState) {
             repeatCount++;
             audio.currentTime = 0;
