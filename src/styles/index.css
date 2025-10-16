@@ -293,3 +293,7 @@ body {
     justify-content: center;
     flex-wrap: wrap;
 }
+
+#clear-playlist i {
+    font-size: 24px;
+}

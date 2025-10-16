@@ -31,6 +31,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
     repeatBtn.addEventListener("click", () => {
+        if (playlist.length === 0) {
+            return; // Не дозволяємо увімкнути repeat, якщо плейлист порожній
+        }
         repeatState = (repeatState + 1) % 3; // Перемикання між 0, 1, 2
         updateRepeatIcon();
     });
@@ -171,9 +174,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Якщо плейлист порожній, вимикаємо автоплей
             if (playlist.length === 0 && isAutoplay) {
-                isAutoplay = false;
-                autoplayBtn.classList.remove("active");
-                autoplayBtn.style.color = "#FFFFFF";
+                if (isAutoplay) {
+                    isAutoplay = false;
+                    autoplayBtn.classList.remove("active");
+                    autoplayBtn.style.color = "#FFFFFF";
+                }
+                if (repeatState !== 0) {
+                    repeatState = 0;
+                    updateRepeatIcon();
+                }
             }
 
             populatePlaylist(); // Оновлюємо відображення плейлиста
@@ -233,18 +242,35 @@ document.addEventListener("DOMContentLoaded", () => {
             .sort((a, b) => a.name.localeCompare(b.name));
         if (files.length === 0) return;
         if (!db) return;
-        const tx = db.transaction(["tracks"], "readwrite");
-        const store = tx.objectStore("tracks");
-        store.clear();
-        files.forEach((file) => {
-            store.put({
-                path: file.name,
-                displayName: file.name,
-                blob: file
+        const txRead = db.transaction(["tracks"], "readonly");
+        const storeRead = txRead.objectStore("tracks");
+        const getAllRequest = storeRead.getAllKeys();
+        getAllRequest.onsuccess = () => {
+            const existingKeys = getAllRequest.result;
+            // Фільтруємо тільки нові файли, яких ще немає в базі
+            const newFiles = files.filter(file => !existingKeys.includes(file.name));
+
+            if (newFiles.length === 0) {
+                // Всі файли вже існують, нічого не робимо
+                return;
+            }
+
+            // Додаємо тільки нові файли
+            const txWrite = db.transaction(["tracks"], "readwrite");
+            const storeWrite = txWrite.objectStore("tracks");
+
+            // ВИДАЛИЛИ store.clear() - ось це була проблема!
+            newFiles.forEach((file) => {
+                storeWrite.put({
+                    path: file.name,
+                    displayName: file.name,
+                    blob: file
+                });
             });
-        });
-        tx.oncomplete = () => {
-            loadPlaylist();
+
+            txWrite.oncomplete = () => {
+                loadPlaylist();
+            };
         };
     });
     clearPlaylistBtn.addEventListener("click", () => {
@@ -271,6 +297,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 isAutoplay = false;
                 autoplayBtn.classList.remove("active");
                 autoplayBtn.style.color = "#FFFFFF";
+            }
+
+            if (repeatState !== 0) {
+                repeatState = 0;
+                updateRepeatIcon();
             }
         };
     });
