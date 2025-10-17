@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Jura:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
+<body oncontextmenu="return false;">
 <canvas id="background"></canvas>
 <div id="moon-container">
     <img id="moon-image" src="src/moon.png" alt="Moon">
@@ -27,18 +27,22 @@
     </div>
 </div>
 <div class="playlist-sidebar">
-    <h3 style="color: #FFFFFF; margin-bottom: 10px; text-align: center;">Моя музика</h3>
-    <div class="buttons-container">
-        <button id="clear-playlist" class="btn"><i class="bi bi-trash3"></i></button>
-        <button class="btn autoplay-toggle"><i class="bi bi-arrow-repeat"></i></button>
-        <button class="btn repeat-toggle"><i class="bi bi-repeat"></i></button>
+    <div class="playlist-header">
+        <h3 style="color: #FFFFFF; margin-bottom: 10px; text-align: center;">Моя музика</h3>
+        <div class="buttons-container">
+            <button id="clear-playlist" class="btn"><i class="bi bi-trash3"></i></button>
+            <button class="btn autoplay-toggle"><i class="bi bi-arrow-repeat"></i></button>
+            <button class="btn repeat-toggle"><i class="bi bi-repeat"></i></button>
+        </div>
+        <div class="search-container">
+            <input type="text" id="playlist-search" placeholder="Пошук музики...">
+            <i class="bi bi-search"></i>
+        </div>
     </div>
-    <div class="search-container">
-        <input type="text" id="playlist-search" placeholder="Пошук музики...">
-        <i class="bi bi-search"></i>
+    <div class="playlist-content">
+        <div id="no-results" class="no-results">За вашим запитом нічого не знайдено</div>
+        <ul id="playlist-list"></ul>
     </div>
-    <div id="no-results" class="no-results">За вашим запитом нічого не знайдено</div>
-    <ul id="playlist-list"></ul>
 </div>
 <div class="footer">
     <div class="track-info" id="track-info"></div>

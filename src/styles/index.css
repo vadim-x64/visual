@@ -5,6 +5,7 @@
     padding: 0;
     box-sizing: border-box;
     font-family: "Jura", sans-serif;
+    user-select: none;
 }
 
 body {
@@ -232,10 +233,20 @@ body {
     background-color: rgba(0, 0, 0, 0.5);
     padding: 20px;
     border-radius: 0;
-    overflow-y: scroll;
+    overflow: hidden;
     opacity: 1;
     transition: all 0.6s ease;
     z-index: 11;
+}
+
+.playlist-header {
+    flex-shrink: 0;
+}
+
+.playlist-content {
+    flex-grow: 1;
+    overflow-y: scroll; /* Додаємо прокрутку тільки для контенту */
+    padding-right: 10px;
 }
 
 .playlist-sidebar:not(.visible) {
