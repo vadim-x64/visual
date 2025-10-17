@@ -232,7 +232,7 @@ body {
     background-color: rgba(0, 0, 0, 0.5);
     padding: 20px;
     border-radius: 0;
-    overflow-y: auto;
+    overflow-y: scroll;
     opacity: 1;
     transition: all 0.6s ease;
     z-index: 11;
@@ -298,4 +298,44 @@ body {
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
+}
+
+.search-container {
+    position: relative;
+    margin-top: 30px;
+}
+
+#playlist-search {
+    width: 100%;
+    padding: 10px 30px 10px 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    color: #FFFFFF;
+    font-size: 18px;
+}
+
+#playlist-search::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.search-container i {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.5);
+    pointer-events: none;
+}
+
+.no-results {
+    color: rgba(255, 255, 255, 0.6);
+    text-align: center;
+    padding: 20px;
+    font-size: 18px;
+    display: none;
+}
+
+.no-results.visible {
+    display: block;
 }

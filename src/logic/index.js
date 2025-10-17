@@ -61,6 +61,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const volumeIcon = document.querySelector(".volume-icon i");
     const playlistList = document.getElementById("playlist-list");
     const clearPlaylistBtn = document.getElementById("clear-playlist");
+    const playlistSearch = document.getElementById("playlist-search");
+    playlistSearch.addEventListener("input", () => {
+        populatePlaylist();
+    });
+    const noResultsDiv = document.getElementById("no-results");
     let hideTimeout;
     let w = (canvas.width = window.innerWidth);
     let h = (canvas.height = window.innerHeight);
@@ -120,8 +125,18 @@ document.addEventListener("DOMContentLoaded", () => {
         };
     }
     function populatePlaylist() {
+        const searchQuery = playlistSearch.value.toLowerCase().trim();
         playlistList.innerHTML = "";
+
+        let visibleCount = 0;
         playlist.forEach((name, index) => {
+            if (searchQuery && !name.toLowerCase().includes(searchQuery)) {
+                return; // Пропускаємо треки, які не відповідають пошуку
+            }
+
+            visibleCount++;
+
+
             const li = document.createElement("li");
             // Додаємо іконку хрестика
             const deleteIcon = document.createElement("i");
@@ -141,6 +156,12 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             playlistList.appendChild(li);
         });
+
+        if (visibleCount === 0 && searchQuery) {
+            noResultsDiv.classList.add("visible");
+        } else {
+            noResultsDiv.classList.remove("visible");
+        }
     }
 
     function deleteTrack(index) {
