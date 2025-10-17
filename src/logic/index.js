@@ -1,3 +1,15 @@
+document.addEventListener("wheel", (e) => {
+    if (e.ctrlKey) {
+        e.preventDefault();
+    }
+}, { passive: false });
+
+document.addEventListener("keydown", (e) => {
+    if (e.ctrlKey && (e.key === "+" || e.key === "-" || e.key === "0")) {
+        e.preventDefault();
+    }
+});
+
 document.addEventListener("DOMContentLoaded", () => {
     const sidebar = document.querySelector(".sidebar");
     const footer = document.querySelector(".footer");
