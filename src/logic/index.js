@@ -198,6 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 isMusicLoaded = false;
                 trackInfo.classList.remove("visible");
                 timeDisplay.classList.remove("visible");
+                footer.classList.add("hidden");
                 playPauseIcon.className = "bi-play";
                 isVisualizationActive = false;
                 currentIndex = -1;
@@ -244,13 +245,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 trackInfo.textContent = track.displayName;
                 trackInfo.classList.add("visible");
                 timeDisplay.classList.add("visible");
+                footer.classList.remove("hidden");
                 isMusicLoaded = true;
                 audio.addEventListener("loadedmetadata", onAudioLoadedMetadata, { once: true });
-
                 audio.play();
                 playPauseIcon.className = "bi bi-pause-fill";
                 isVisualizationActive = true;
-
                 populatePlaylist();
             }
         };
@@ -323,6 +323,7 @@ document.addEventListener("DOMContentLoaded", () => {
             isMusicLoaded = false;
             trackInfo.classList.remove("visible");
             timeDisplay.classList.remove("visible");
+            footer.classList.add("hidden");
             playPauseIcon.className = "bi-play";
             isVisualizationActive = false;
 
@@ -942,5 +943,6 @@ document.addEventListener("DOMContentLoaded", () => {
         playlistSidebar.classList.remove("visible");
     }
     showControls();
+    footer.classList.add("hidden");
     document.addEventListener("mousemove", showControls);
 });
