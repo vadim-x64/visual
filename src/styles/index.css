@@ -354,3 +354,81 @@ body {
 .footer.hidden {
     display: none;
 }
+
+.queue-header {
+    color: #FFD700;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: rgba(255, 215, 0, 0.1);
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.queue-item {
+    background-color: rgba(255, 215, 0, 0.15) !important;
+    border-left: 3px solid #FFD700 !important;
+}
+
+.queue-item:hover {
+    background-color: rgba(255, 215, 0, 0.25) !important;
+}
+
+.queue-circle {
+    display: inline-block;
+    background-color: #FFD700;
+    color: #000000;
+    font-size: 14px;
+    font-weight: bold;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    border-radius: 50%;
+    text-align: center;
+    margin-right: 10px;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.queue-separator {
+    height: 2px;
+    background: linear-gradient(to right, transparent, #FFD700, transparent);
+    margin: 15px 0;
+}
+
+.queue-badge {
+    display: inline-block;
+    background-color: #FFD700;
+    color: #000000;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 50%;
+    margin-left: 10px;
+    min-width: 24px;
+    text-align: center;
+}
+
+.queue-notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background-color: rgba(0, 0, 0, 0.9);
+    color: #FFD700;
+    padding: 15px 30px;
+    border-radius: 10px;
+    border: 2px solid #FFD700;
+    font-size: 18px;
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.queue-notification.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
