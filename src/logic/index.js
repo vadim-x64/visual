@@ -21,11 +21,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const repeatBtn = document.querySelector(".repeat-toggle");
     const autoplayBtn = document.querySelector(".autoplay-toggle");
     let isAutoplay = false;
-    let repeatState = 0; // 0: вимкнено, 1: повторити 1 раз, 2: повторити 2 рази
+    let repeatState = 0;
     let repeatCount = 0;
     autoplayBtn.addEventListener("click", () => {
         if (playlist.length === 0) {
-            return; // Не дозволяємо увімкнути автоплей, якщо плейлист порожній
+            return;
         }
         isAutoplay = !isAutoplay;
         autoplayBtn.classList.toggle("active", isAutoplay);
@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (isAutoplay && playlist.length > 0) {
             if (currentIndex === -1) {
-                playTrack(0); // Почати відтворення першого треку
+                playTrack(0);
             } else if (isMusicLoaded && audio.paused) {
                 audio.play();
                 playPauseIcon.className = "bi bi-pause-fill";
@@ -44,9 +44,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     repeatBtn.addEventListener("click", () => {
         if (playlist.length === 0) {
-            return; // Не дозволяємо увімкнути repeat, якщо плейлист порожній
+            return;
         }
-        repeatState = (repeatState + 1) % 3; // Перемикання між 0, 1, 2
+        repeatState = (repeatState + 1) % 3;
         updateRepeatIcon();
     });
     function updateRepeatIcon() {
@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const volumeValue = volumeSlider.value / 100;
         audio.volume = volumeValue;
         localStorage.setItem("audioVolume", volumeSlider.value);
-        updateVolumeIcon(); // Оновити іконку
+        updateVolumeIcon();
     });
     window.addEventListener("resize", () => {
         w = canvas.width = window.innerWidth;
@@ -133,7 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
             playlist = tracks.map((t) => t.displayName);
             populatePlaylist();
             if (playlist.length > 0 && currentIndex === -1 && isAutoplay) {
-                playTrack(0); // Auto-play first track if autoplay is enabled
+                playTrack(0);
             }
         };
     }
@@ -142,9 +142,6 @@ document.addEventListener("DOMContentLoaded", () => {
         playlistList.innerHTML = "";
 
         let visibleCount = 0;
-
-
-
 
         if (queue.length > 0) {
             const queueHeader = document.createElement("div");
@@ -162,12 +159,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 const li = document.createElement("li");
                 li.classList.add("queue-item");
 
-                // Жовтий кружечок з номером
                 const queueCircle = document.createElement("span");
                 queueCircle.className = "queue-circle";
                 queueCircle.textContent = position + 1;
 
-                // Іконка видалення з черги
                 const removeIcon = document.createElement("i");
                 removeIcon.className = "bi bi-x-circle";
                 removeIcon.style.marginLeft = "10px";
@@ -181,13 +176,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 li.appendChild(document.createTextNode(name));
                 li.appendChild(removeIcon);
 
-                // Лівий клік - відтворити зараз
                 li.addEventListener("click", () => {
                     removeFromQueue(position);
                     playTrack(queueIndex);
                 });
 
-                // Правий клік - видалити з черги
                 li.addEventListener("contextmenu", (e) => {
                     e.preventDefault();
                     removeFromQueue(position);
@@ -196,14 +189,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 playlistList.appendChild(li);
             });
 
-            // Роздільник
             const separator = document.createElement("div");
             separator.className = "queue-separator";
             playlistList.appendChild(separator);
         }
 
         playlist.forEach((name, index) => {
-            // Пропускаємо треки, які вже в черзі
             if (queue.includes(index)) {
                 return;
             }
@@ -228,10 +219,8 @@ document.addEventListener("DOMContentLoaded", () => {
             li.appendChild(deleteIcon);
             li.appendChild(document.createTextNode(name));
 
-            // Лівий клік - відтворення
             li.addEventListener("click", () => playTrack(index));
 
-            // Правий клік - додавання в чергу
             li.addEventListener("contextmenu", (e) => {
                 e.preventDefault();
                 addToQueue(index);
@@ -257,30 +246,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function addToQueue(index) {
-        if (!isMusicLoaded) return; // Не додаємо в чергу, якщо нічого не грає
+        if (!isMusicLoaded) return;
 
         if (!queue.includes(index)) {
             queue.push(index);
             populatePlaylist();
-
-            // Показуємо повідомлення
-            showQueueNotification(playlist[index]);
         }
-    }
-
-// Додай функцію для показу повідомлення:
-    function showQueueNotification(trackName) {
-        const notification = document.createElement("div");
-        notification.className = "queue-notification";
-        notification.textContent = `Додано в чергу: ${trackName}`;
-        document.body.appendChild(notification);
-
-        setTimeout(() => notification.classList.add("show"), 10);
-
-        setTimeout(() => {
-            notification.classList.remove("show");
-            setTimeout(() => notification.remove(), 300);
-        }, 2000);
     }
 
     function deleteTrack(index) {
@@ -296,11 +267,10 @@ document.addEventListener("DOMContentLoaded", () => {
             playlist.splice(index, 1);
 
             queue = queue.map(queueIndex => {
-                if (queueIndex === index) return -1; // Видалений трек
-                if (queueIndex > index) return queueIndex - 1; // Зсув індексів
+                if (queueIndex === index) return -1;
+                if (queueIndex > index) return queueIndex - 1;
                 return queueIndex;
             }).filter(i => i !== -1);
-            // Якщо видалений трек був поточним
             if (index === currentIndex) {
                 audio.pause();
                 if (audio.src) {
@@ -332,7 +302,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
 
-            populatePlaylist(); // Оновлюємо відображення плейлиста
+            populatePlaylist();
         };
     }
     function onAudioLoadedMetadata() {
