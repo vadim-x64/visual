@@ -1,3 +1,10 @@
+setTimeout(() => {
+    const splashScreen = document.getElementById("splash-screen");
+    if (splashScreen) {
+        splashScreen.style.display = "none";
+    }
+}, 3000);
+
 document.addEventListener("wheel", (e) => {
     if (e.ctrlKey) {
         e.preventDefault();
