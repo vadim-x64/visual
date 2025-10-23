@@ -1,9 +1,123 @@
+(function() {
+    const splashScreen = document.getElementById('splash-screen');
+
+    const colors = [
+        'rgba(1, 255, 215, 88)',
+        'rgba(0, 132, 255, 100)',
+        'rgba(162, 0, 229, 90)'
+    ];
+
+    for (let i = 1; i <= 5; i++) {
+        const x = Math.random() * 100;
+        const y = Math.random() * 100;
+        const size = 30 + Math.random() * 50;
+        const color = colors[i - 1];
+
+        splashScreen.style.setProperty(`--x${i}`, `${x}%`);
+        splashScreen.style.setProperty(`--y${i}`, `${y}%`);
+        splashScreen.style.setProperty(`--size${i}`, `${size}%`);
+        splashScreen.style.setProperty(`--color${i}`, color);
+    }
+})();
+
+(function() {
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = 500;
+    canvas.height = 100;
+    const text = 'VISION';
+    const fontSize = 80;
+    const particles = [];
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+    tempCtx.font = `bold ${fontSize}px Jura`;
+    tempCtx.fillStyle = '#FFFFFF';
+    tempCtx.textAlign = 'center';
+    tempCtx.textBaseline = 'middle';
+    tempCtx.fillText(text, canvas.width / 2, canvas.height / 2);
+    const imageData = tempCtx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+
+    for (let y = 0; y < canvas.height; y += 2) {
+        for (let x = 0; x < canvas.width; x += 2) {
+            const index = (y * canvas.width + x) * 4;
+            const alpha = data[index + 3];
+
+            if (alpha > 128) {
+                particles.push({
+                    targetX: x,
+                    targetY: y,
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: 0,
+                    vy: 0,
+                    size: 1.5 + Math.random() * 1.5,
+                    opacity: 0
+                });
+            }
+        }
+    }
+
+    let frame = 0;
+    const animationDuration = 144;
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        particles.forEach(p => {
+            // Рух до цільової позиції
+            const dx = p.targetX - p.x;
+            const dy = p.targetY - p.y;
+
+            p.vx += dx * 0.01;
+            p.vy += dy * 0.01;
+
+            p.vx *= 0.85;
+            p.vy *= 0.85;
+
+            p.x += p.vx;
+            p.y += p.vy;
+
+            // Плавна поява
+            if (frame < 60) {
+                p.opacity = Math.min(1, p.opacity + 0.02);
+            }
+
+            // Малюємо частинку - ЧИСТО БІЛИЙ КОЛІР
+            ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Додаємо біле свічення замість фіолетового
+            if (p.opacity > 0.5) {
+                ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity * 0.2})`;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size * 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        });
+
+        frame++;
+
+        if (frame < animationDuration) {
+            requestAnimationFrame(animate);
+        }
+    }
+
+    setTimeout(() => {
+        animate();
+    }, 1000);
+})();
+
 setTimeout(() => {
     const splashScreen = document.getElementById("splash-screen");
     if (splashScreen) {
         splashScreen.style.display = "none";
     }
-}, 3000);
+}, 5000);
 
 document.addEventListener("wheel", (e) => {
     if (e.ctrlKey) {
