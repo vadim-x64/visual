@@ -497,3 +497,45 @@ body {
     transform: translateX(-50%) translateY(0);
     opacity: 1;
 }
+
+.tooltip {
+    position: relative;
+}
+
+.tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    background: rgba(0, 0, 0, 0.8);
+    color: #FFFFFF;
+    padding: 5px 10px;
+    border-radius: 10px;
+    font-size: 14px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+    z-index: 9999;
+    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+}
+
+.tooltip:hover::after {
+    opacity: 1;
+}
+
+.sidebar .tooltip::after {
+    top: 50%;
+    left: 100px;
+    transform: translateY(-50%);
+}
+
+.footer .tooltip::after {
+    bottom: 40px;
+    left: 100px;
+    transform: translateX(-50%);
+}
+
+.playlist-sidebar .tooltip::after {
+    top: 60px;
+    left: 20px;
+    transform: translateY(-50%);
+}

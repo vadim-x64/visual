@@ -132,6 +132,40 @@ document.addEventListener("keydown", (e) => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
+    const confirmModal = document.getElementById("confirm-modal");
+    const confirmMessage = document.getElementById("confirm-message");
+    const confirmYes = document.getElementById("confirm-yes");
+    const confirmNo = document.getElementById("confirm-no");
+    let currentConfirmCallback = null;
+
+    function showConfirm(message, callback) {
+        confirmMessage.textContent = message;
+        confirmModal.classList.add("visible");
+        currentConfirmCallback = callback;
+
+        // Обробники для кнопок (одноразові, щоб уникнути дублювання)
+        const handleYes = () => {
+            if (currentConfirmCallback) currentConfirmCallback();
+            closeModal();
+            confirmYes.removeEventListener("click", handleYes);
+            confirmNo.removeEventListener("click", handleNo);
+        };
+
+        const handleNo = () => {
+            closeModal();
+            confirmYes.removeEventListener("click", handleYes);
+            confirmNo.removeEventListener("click", handleNo);
+        };
+
+        confirmYes.addEventListener("click", handleYes);
+        confirmNo.addEventListener("click", handleNo);
+    }
+
+    function closeModal() {
+        confirmModal.classList.remove("visible");
+        currentConfirmCallback = null;
+    }
+
     const sidebar = document.querySelector(".sidebar");
     const footer = document.querySelector(".footer");
     const playlistSidebar = document.querySelector(".playlist-sidebar");
@@ -290,7 +324,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 removeIcon.style.cursor = "pointer";
                 removeIcon.addEventListener("click", (e) => {
                     e.stopPropagation();
-                    removeFromQueue(position);
+                    showConfirm(`Ви впевнені, що хочете видалити "${name}" з черги?`, () => {
+                        removeFromQueue(position);
+                    });
                 });
 
                 li.appendChild(queueCircle);
@@ -334,7 +370,9 @@ document.addEventListener("DOMContentLoaded", () => {
             deleteIcon.style.cursor = "pointer";
             deleteIcon.addEventListener("click", (e) => {
                 e.stopPropagation();
-                deleteTrack(index);
+                showConfirm(`Ви впевнені, що хочете видалити "${name}"?`, () => {
+                    deleteTrack(index);
+                });
             });
 
             li.appendChild(deleteIcon);
@@ -511,38 +549,41 @@ document.addEventListener("DOMContentLoaded", () => {
         };
     });
     clearPlaylistBtn.addEventListener("click", () => {
-        if (!db) return;
-        const tx = db.transaction(["tracks"], "readwrite");
-        const store = tx.objectStore("tracks");
-        store.clear();
-        tx.oncomplete = () => {
-            playlist = [];
-            currentIndex = -1;
-            queue = [];
-            populatePlaylist();
-            if (audio.src) {
-                URL.revokeObjectURL(audio.src);
-                audio.pause();
-                audio.src = "";
-            }
-            isMusicLoaded = false;
-            trackInfo.classList.remove("visible");
-            timeDisplay.classList.remove("visible");
-            footer.classList.add("hidden");
-            playPauseIcon.className = "bi-play";
-            isVisualizationActive = false;
+        if (playlist.length === 0) return;
+        showConfirm("Ви впевнені, що хочете очистити весь список музики?", () => {
+            if (!db) return;
+            const tx = db.transaction(["tracks"], "readwrite");
+            const store = tx.objectStore("tracks");
+            store.clear();
+            tx.oncomplete = () => {
+                playlist = [];
+                currentIndex = -1;
+                queue = [];
+                populatePlaylist();
+                if (audio.src) {
+                    URL.revokeObjectURL(audio.src);
+                    audio.pause();
+                    audio.src = "";
+                }
+                isMusicLoaded = false;
+                trackInfo.classList.remove("visible");
+                timeDisplay.classList.remove("visible");
+                footer.classList.add("hidden");
+                playPauseIcon.className = "bi-play";
+                isVisualizationActive = false;
 
-            if (isAutoplay) {
-                isAutoplay = false;
-                autoplayBtn.classList.remove("active");
-                autoplayBtn.style.color = "#FFFFFF";
-            }
+                if (isAutoplay) {
+                    isAutoplay = false;
+                    autoplayBtn.classList.remove("active");
+                    autoplayBtn.style.color = "#FFFFFF";
+                }
 
-            if (repeatState !== 0) {
-                repeatState = 0;
-                updateRepeatIcon();
-            }
-        };
+                if (repeatState !== 0) {
+                    repeatState = 0;
+                    updateRepeatIcon();
+                }
+            };
+        });
     });
     playPauseBtn.addEventListener("click", () => {
         if (!isMusicLoaded) return;

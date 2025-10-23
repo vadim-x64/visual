@@ -6,6 +6,7 @@
     <title>Vision</title>
     <link rel="icon" type="image/png" href="src/icon.png">
     <link rel="stylesheet" href="src/styles/index.css">
+    <link rel="stylesheet" href="src/styles/modal.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Jura:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
@@ -19,9 +20,9 @@
     <img id="moon-image" src="src/moon.png" alt="Moon">
 </div>
 <div class="sidebar">
-    <button class="btn add-music" title="Додати музику"><i class="bi-plus"></i></button>
+    <button class="btn add-music tooltip" data-tooltip="Додати музику"><i class="bi-plus"></i></button>
     <input type="file" id="music-input" accept="audio/*" multiple style="display: none;">
-    <button class="btn play-pause" title="Відтворити/Пауза"><i class="bi bi-play"></i></button>
+    <button class="btn play-pause tooltip" data-tooltip="Старт/Стоп"><i class="bi bi-play"></i></button>
     <div class="animation-select">
         <select id="animation">
             <option value="circle">Коло</option>
@@ -35,9 +36,9 @@
     <div class="playlist-header">
         <h3 style="color: #FFFFFF; margin-bottom: 10px; text-align: center;">Моя музика</h3>
         <div class="buttons-container">
-            <button id="clear-playlist" class="btn"><i class="bi bi-trash3"></i></button>
-            <button class="btn autoplay-toggle"><i class="bi bi-arrow-repeat"></i></button>
-            <button class="btn repeat-toggle"><i class="bi bi-repeat"></i></button>
+            <button id="clear-playlist" class="btn tooltip" data-tooltip="Очистити список"><i class="bi bi-trash3"></i></button>
+            <button class="btn autoplay-toggle tooltip" data-tooltip="Автоплей"><i class="bi bi-arrow-repeat"></i></button>
+            <button class="btn repeat-toggle tooltip" data-tooltip="Репіт"><i class="bi bi-repeat"></i></button>
         </div>
         <div class="search-container">
             <input type="text" id="playlist-search" placeholder="Пошук музики...">
@@ -51,14 +52,23 @@
 </div>
 <div class="footer">
     <div class="track-info" id="track-info"></div>
-    <div class="timeline-control">
+    <div class="timeline-control tooltip" data-tooltip="Слайдер">
         <span class="timeline-icon"><i class="bi bi-music-note-beamed"></i></span>
         <input type="range" id="timeline" min="0" max="100" value="0">
     </div>
     <div class="time-display" id="time-display"></div>
-    <div class="volume-control">
+    <div class="volume-control tooltip" data-tooltip="Гучність">
         <span class="volume-icon"><i class="bi bi-volume-up-fill"></i></span>
         <input type="range" id="volume" min="0" max="100" value="100">
+    </div>
+</div>
+<div id="confirm-modal" class="modal-overlay">
+    <div class="modal-content">
+        <p id="confirm-message"></p>
+        <div class="modal-buttons">
+            <button id="confirm-yes" class="modal-btn yes">Підтвердити</button>
+            <button id="confirm-no" class="modal-btn no">Скасувати</button>
+        </div>
     </div>
 </div>
 <audio id="audio" style="display: none;"></audio>
