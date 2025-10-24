@@ -123,6 +123,10 @@ body {
     color: #FFFFFF;
 }
 
+.btn.toggle-visualization i {
+    font-size: 24px;
+}
+
 .animation-select select {
     background-color: rgba(0, 0, 0, 0.5);
     color: #FFFFFF;
@@ -537,5 +541,95 @@ body {
 .playlist-sidebar .tooltip::after {
     top: 60px;
     left: 20px;
+    transform: translateY(-50%);
+}
+
+.lock-btn.tooltip::after {
+    top: 50%;
+    left: 70px;
+    transform: translateY(-50%);
+}
+
+.lock-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.3);
+    color: #FFFFFF;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: all 0.6s ease, background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    opacity: 1;
+    border: 3px solid transparent;
+}
+
+.lock-btn:hover {
+    transform: scale(1.1);
+}
+
+.lock-btn.locked {
+    color: #FFD700;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-color: #FFD700;
+}
+
+.lock-btn:not(.visible) {
+    opacity: 0;
+    transform: translateX(-150%);
+}
+
+.lock-btn.visible {
+    transform: translateX(0);
+}
+
+.fullscreen-btn {
+    position: fixed;
+    top: 20px;
+    left: 100px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.3);
+    color: #FFFFFF;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: all 0.6s ease, background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    opacity: 1;
+    border: 3px solid transparent;
+}
+
+.fullscreen-btn:hover {
+    transform: scale(1.1);
+}
+
+.fullscreen-btn.active {
+    color: #00D9FF;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-color: #00D9FF;
+}
+
+.fullscreen-btn:not(.visible) {
+    opacity: 0;
+    transform: translateX(-150%);
+}
+
+.fullscreen-btn.visible {
+    transform: translateX(0);
+}
+
+.fullscreen-btn.tooltip::after {
+    top: 50%;
+    left: 70px;
     transform: translateY(-50%);
 }

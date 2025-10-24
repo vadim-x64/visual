@@ -132,6 +132,91 @@ document.addEventListener("keydown", (e) => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
+    const fullscreenBtn = document.getElementById("fullscreen-toggle");
+    let isFullscreen = false;
+
+    fullscreenBtn.addEventListener("click", () => {
+        if (!isFullscreen) {
+            // Увійти в повноекранний режим
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.webkitRequestFullscreen) {
+                document.documentElement.webkitRequestFullscreen();
+            } else if (document.documentElement.mozRequestFullScreen) {
+                document.documentElement.mozRequestFullScreen();
+            } else if (document.documentElement.msRequestFullscreen) {
+                document.documentElement.msRequestFullscreen();
+            }
+        } else {
+            // Вийти з повноекранного режиму
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        }
+    });
+
+    document.addEventListener("fullscreenchange", updateFullscreenButton);
+    document.addEventListener("webkitfullscreenchange", updateFullscreenButton);
+    document.addEventListener("mozfullscreenchange", updateFullscreenButton);
+    document.addEventListener("MSFullscreenChange", updateFullscreenButton);
+
+    function updateFullscreenButton() {
+        isFullscreen = !!(document.fullscreenElement || document.webkitFullscreenElement ||
+            document.mozFullScreenElement || document.msFullscreenElement);
+
+        const icon = fullscreenBtn.querySelector("i");
+
+        if (isFullscreen) {
+            icon.className = "bi bi-fullscreen-exit";
+            fullscreenBtn.classList.add("active");
+            fullscreenBtn.setAttribute("data-tooltip", "Вийти з повного екрану");
+        } else {
+            icon.className = "bi bi-arrows-fullscreen";
+            fullscreenBtn.classList.remove("active");
+            fullscreenBtn.setAttribute("data-tooltip", "Повний екран");
+        }
+    }
+
+    const lockBtn = document.getElementById("lock-toggle");
+    let isLocked = false;
+
+    lockBtn.addEventListener("click", () => {
+        isLocked = !isLocked;
+        const icon = lockBtn.querySelector("i");
+
+        if (isLocked) {
+            icon.className = "bi bi-lock-fill";
+            lockBtn.classList.add("locked");
+            lockBtn.setAttribute("data-tooltip", "Відкріпити");
+        } else {
+            icon.className = "bi bi-unlock";
+            lockBtn.classList.remove("locked");
+            lockBtn.setAttribute("data-tooltip", "Закріпити");
+        }
+    });
+
+    let isVisualizationEnabled = true; // Новий стан для контролю анімації
+    const toggleVisualizationBtn = document.querySelector(".toggle-visualization");
+
+    toggleVisualizationBtn.addEventListener("click", () => {
+        isVisualizationEnabled = !isVisualizationEnabled;
+        const icon = toggleVisualizationBtn.querySelector("i");
+
+        if (isVisualizationEnabled) {
+            icon.className = "bi bi-eye"; // Відкритий замочок = анімація працює
+            toggleVisualizationBtn.style.color = "#FFFFFF";
+        } else {
+            icon.className = "bi bi-eye-slash"; // Закритий замочок = анімація заблокована
+            toggleVisualizationBtn.style.color = "#FF4040";
+        }
+    });
+
     const confirmModal = document.getElementById("confirm-modal");
     const confirmMessage = document.getElementById("confirm-message");
     const confirmYes = document.getElementById("confirm-yes");
@@ -1124,9 +1209,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         ctx.filter = "none";
         if (analyser && isMusicLoaded) {
-            if (isVisualizationActive && visualizationOpacity < 1) {
+            if (isVisualizationActive && isVisualizationEnabled && visualizationOpacity < 1) {
                 visualizationOpacity += 0.02;
-            } else if (!isVisualizationActive && visualizationOpacity > 0) {
+            } else if ((!isVisualizationActive || !isVisualizationEnabled) && visualizationOpacity > 0) {
                 visualizationOpacity -= 0.02;
             }
             if (visualizationOpacity > 0) {
@@ -1177,7 +1262,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 time += 1;
             }
         }
-        if (currentAnimation === 'cosmic' && isVisualizationActive && visualizationOpacity > 0.05) {
+        if (currentAnimation === 'cosmic' && isVisualizationActive && isVisualizationEnabled && visualizationOpacity > 0.05) {
             moonContainer.classList.add('visible');
         } else {
             moonContainer.classList.remove('visible');
@@ -1190,15 +1275,32 @@ document.addEventListener("DOMContentLoaded", () => {
         sidebar.classList.add("visible");
         footer.classList.add("visible");
         playlistSidebar.classList.add("visible");
-        clearTimeout(hideTimeout);
-        hideTimeout = setTimeout(hideControls, 3000);
+        lockBtn.classList.add("visible");
+        fullscreenBtn.classList.add("visible"); // ← ДОДАЙ ЦЕ
+
+        if (!isLocked) {
+            clearTimeout(hideTimeout);
+            hideTimeout = setTimeout(hideControls, 3000);
+        }
     }
+
     function hideControls() {
-        sidebar.classList.remove("visible");
-        footer.classList.remove("visible");
-        playlistSidebar.classList.remove("visible");
+        if (!isLocked) {
+            sidebar.classList.remove("visible");
+            footer.classList.remove("visible");
+            playlistSidebar.classList.remove("visible");
+            lockBtn.classList.remove("visible");
+            fullscreenBtn.classList.remove("visible"); // ← ДОДАЙ ЦЕ
+        }
     }
     showControls();
     footer.classList.add("hidden");
     document.addEventListener("mousemove", showControls);
+
+    window.addEventListener("beforeunload", (e) => {
+        if (isMusicLoaded && !audio.paused) {
+            e.returnValue = "Музика зараз грає. Ви дійсно хочете перезавантажити сторінку?";
+            return e.returnValue;
+        }
+    });
 });

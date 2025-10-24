@@ -16,6 +16,12 @@
     <canvas id="particle-canvas"></canvas>
 </div>
 <canvas id="background"></canvas>
+<button id="lock-toggle" class="lock-btn tooltip" data-tooltip="Закріпити">
+    <i class="bi bi-unlock"></i>
+</button>
+<button id="fullscreen-toggle" class="fullscreen-btn tooltip" data-tooltip="Повний екран">
+    <i class="bi bi-arrows-fullscreen"></i>
+</button>
 <div id="moon-container">
     <img id="moon-image" src="src/moon.png" alt="Moon">
 </div>
@@ -23,6 +29,7 @@
     <button class="btn add-music tooltip" data-tooltip="Додати музику"><i class="bi-plus"></i></button>
     <input type="file" id="music-input" accept="audio/*" multiple style="display: none;">
     <button class="btn play-pause tooltip" data-tooltip="Старт/Стоп"><i class="bi bi-play"></i></button>
+    <button class="btn toggle-visualization tooltip" data-tooltip="Анімація"><i class="bi bi-eye"></i></button>
     <div class="animation-select">
         <select id="animation">
             <option value="circle">Коло</option>
@@ -52,7 +59,7 @@
 </div>
 <div class="footer">
     <div class="track-info" id="track-info"></div>
-    <div class="timeline-control tooltip" data-tooltip="Слайдер">
+    <div class="timeline-control tooltip" data-tooltip="Повзунок пошуку">
         <span class="timeline-icon"><i class="bi bi-music-note-beamed"></i></span>
         <input type="range" id="timeline" min="0" max="100" value="0">
     </div>
