@@ -132,6 +132,8 @@ document.addEventListener("keydown", (e) => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
+    const playlistCounter = document.getElementById("playlist-counter");
+
     const fullscreenBtn = document.getElementById("fullscreen-toggle");
     let isFullscreen = false;
 
@@ -481,6 +483,19 @@ document.addEventListener("DOMContentLoaded", () => {
             noResultsDiv.classList.add("visible");
         } else {
             noResultsDiv.classList.remove("visible");
+        }
+
+        updatePlaylistCounter();
+    }
+
+    function updatePlaylistCounter() {
+        const totalTracks = playlist.length;
+        const queueCount = queue.length;
+
+        if (queueCount > 0) {
+            playlistCounter.textContent = `Треків: ${totalTracks} | Черга: ${queueCount}`;
+        } else {
+            playlistCounter.textContent = `Треків: ${totalTracks}`;
         }
     }
 
