@@ -25,80 +25,31 @@
     const ctx = canvas.getContext('2d');
     canvas.width = 500;
     canvas.height = 100;
-    const text = 'VISION';
+    const text = 'VISUAL+';
     const fontSize = 80;
-    const particles = [];
-    const tempCanvas = document.createElement('canvas');
-    const tempCtx = tempCanvas.getContext('2d');
-    tempCanvas.width = canvas.width;
-    tempCanvas.height = canvas.height;
-    tempCtx.font = `bold ${fontSize}px Jura`;
-    tempCtx.fillStyle = '#FFFFFF';
-    tempCtx.textAlign = 'center';
-    tempCtx.textBaseline = 'middle';
-    tempCtx.fillText(text, canvas.width / 2, canvas.height / 2);
-    const imageData = tempCtx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imageData.data;
 
-    for (let y = 0; y < canvas.height; y += 2) {
-        for (let x = 0; x < canvas.width; x += 2) {
-            const index = (y * canvas.width + x) * 4;
-            const alpha = data[index + 3];
-
-            if (alpha > 128) {
-                particles.push({
-                    targetX: x,
-                    targetY: y,
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    vx: 0,
-                    vy: 0,
-                    size: 1.5 + Math.random() * 1.5,
-                    opacity: 0
-                });
-            }
-        }
-    }
+    ctx.font = `bold ${fontSize}px Jura`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
 
     let frame = 0;
-    const animationDuration = 144;
+    const animationDuration = 120;
+    let opacity = 0;
 
     function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        particles.forEach(p => {
-            // Рух до цільової позиції
-            const dx = p.targetX - p.x;
-            const dy = p.targetY - p.y;
+        // Плавна поява
+        if (frame < 60) {
+            opacity = Math.min(1, opacity + 0.02);
+        }
 
-            p.vx += dx * 0.01;
-            p.vy += dy * 0.01;
+        // Чистий білий текст з м'яким свіченням
+        ctx.shadowBlur = 20 + Math.sin(frame * 0.05) * 10;
+        ctx.shadowColor = `rgba(255, 255, 255, ${opacity * 0.8})`;
 
-            p.vx *= 0.85;
-            p.vy *= 0.85;
-
-            p.x += p.vx;
-            p.y += p.vy;
-
-            // Плавна поява
-            if (frame < 60) {
-                p.opacity = Math.min(1, p.opacity + 0.02);
-            }
-
-            // Малюємо частинку - ЧИСТО БІЛИЙ КОЛІР
-            ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Додаємо біле свічення замість фіолетового
-            if (p.opacity > 0.5) {
-                ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity * 0.2})`;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size * 2, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        });
+        ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+        ctx.fillText(text, canvas.width / 2, canvas.height / 2);
 
         frame++;
 
